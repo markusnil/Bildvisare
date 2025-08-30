@@ -59,6 +59,7 @@ class WebcamApp:
 
     def run(self):
         self.root.mainloop()
+        
 
     def release(self):
         if self.cap.isOpened():
