@@ -84,7 +84,7 @@ def list_files(service, folder_id=None, page_size=20):
     query = f"'{folder_id}' in parents" if folder_id else None
     results = (
         service.files()
-        .list(q=query, pageSize=page_size, fields="nextPageToken, files(id, name)")
+        .list(q=query, pageSize=page_size, fields="nextPageToken, files(id, name, mimeType)")
         .execute()
     )
     return results.get("files", [])

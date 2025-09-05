@@ -21,8 +21,10 @@ for f in files:
 local_images = []
 # Download files
 for f in files:
-    download_file(service, f['id'], f['name'], dest_dir=".\Images")
-    local_images.append(f['name'])
+    mime_type = f['mimeType']
+    if not mime_type.startswith("application/vnd.google-apps"):
+        download_file(service, f['id'], f['name'], dest_dir=".\Images")
+        local_images.append(f['name'])
 
 # Variables for slideshow
 Num_images = len(local_images)
@@ -80,7 +82,9 @@ def slideshow():
         return  # nothing to show
     filename = os.path.join(".\Images", local_images[imagecounter])
     setPhoto(filename)
-    imagecounter = (imagecounter + 1) % Num_images
+    imagecounter = imagecounter + 1
+    imagecounter = imagecounter % Num_images
+    print(imagecounter)
     root.after(5000, slideshow)
 
 def startcamera():
