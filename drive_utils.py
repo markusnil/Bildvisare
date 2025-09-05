@@ -67,6 +67,7 @@ def download_file(service, file_id, filename, dest_dir="."):
         return
 
     request = service.files().get_media(fileId=file_id)
+    print(file_path)
     fh = io.FileIO(file_path, "wb")
     downloader = MediaIoBaseDownload(fh, request)
 
