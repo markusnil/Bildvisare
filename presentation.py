@@ -21,7 +21,7 @@ for f in files:
 local_images = []
 # Download files
 for f in files:
-    download_file(service, f['id'], f['name'], dest_dir=".\Images")
+    download_file(service, f['id'], f['name'], dest_dir="./Images")
     local_images.append(f['name'])
 
 # Variables for slideshow
@@ -78,7 +78,7 @@ def slideshow():
     global imagecounter
     if not local_images:
         return  # nothing to show
-    filename = os.path.join(".\Images", local_images[imagecounter])
+    filename = os.path.join("./Images", local_images[imagecounter])
     setPhoto(filename)
     imagecounter = (imagecounter + 1) % Num_images
     root.after(5000, slideshow)
