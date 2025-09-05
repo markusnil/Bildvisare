@@ -5,6 +5,9 @@ import os
 from drive_utils import get_service, list_files, upload_file, download_file
 from datetime import datetime
 import camera
+from pillow_heif import register_heif_opener
+
+register_heif_opener()
 
 
 shared_folder_id = "18l_kSviqElZrFXgI_y9WsKaFeBtFpyp-"
@@ -12,19 +15,27 @@ shared_folder_id = "18l_kSviqElZrFXgI_y9WsKaFeBtFpyp-"
 # Authenticate and get service
 service = get_service()
 
-# Get files that are available on drive:
-files = list_files(service, folder_id=shared_folder_id)
-for f in files:
-    print(f"{f['name']} \t ({f['id']})")
+
 
 
 local_images = []
+
+
+
+def checkFilesAndDownload():
+    global local_images
+    # Get files that are available on drive:
+    files = list_files(service, folder_id=shared_folder_id)
+        
+    for f in files:
+        print(f"{f['name']} \t ({f['id']})")
+        mime_type = f['mimeType']
+        if not mime_type.startswith("application/vnd.google-apps"):
+            download_file(service, f['id'], f['name'], dest_dir="./Images")
+            local_images.append(f['name'])
+
 # Download files
-for f in files:
-    mime_type = f['mimeType']
-    if not mime_type.startswith("application/vnd.google-apps"):
-        download_file(service, f['id'], f['name'], dest_dir="./Images")
-        local_images.append(f['name'])
+checkFilesAndDownload()
 
 # Variables for slideshow
 Num_images = len(local_images)
@@ -83,9 +94,10 @@ def slideshow():
     filename = os.path.join("./Images", local_images[imagecounter])
     setPhoto(filename)
     imagecounter = imagecounter + 1
-    imagecounter = imagecounter % Num_images
-    print(imagecounter)
-    root.after(5000, slideshow)
+    imagecounter = imagecounter % len(local_images)
+    if (imagecounter == (len(local_images)-1)):
+        checkFilesAndDownload()
+    root.after(10000, slideshow)
 
 def startcamera():
     global mycamera
