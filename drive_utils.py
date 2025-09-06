@@ -82,7 +82,7 @@ def download_file(service, file_id, filename, dest_dir="."):
 
 def list_files(service, folder_id=None, page_size=20):
     """List files in Google Drive, optionally filtered by folder_id."""
-    query = f"'{folder_id}' in parents" if folder_id else None
+    query = f"'{folder_id}' in parents and trashed = false" if folder_id else None
     results = (
         service.files()
         .list(q=query, pageSize=page_size, fields="nextPageToken, files(id, name, mimeType)")

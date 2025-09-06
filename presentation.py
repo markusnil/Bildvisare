@@ -17,16 +17,21 @@ service = get_service()
 
 
 
-
+# Variables for slideshow
+imagecounter = 0
+mycamera = None
 local_images = []
 
 
 
 def checkFilesAndDownload():
     global local_images
+    global imagecounter
     # Get files that are available on drive:
     files = list_files(service, folder_id=shared_folder_id)
-        
+    local_images = []
+
+    # Download files which are not already in /Images:
     for f in files:
         print(f"{f['name']} \t ({f['id']})")
         mime_type = f['mimeType']
@@ -34,13 +39,27 @@ def checkFilesAndDownload():
             download_file(service, f['id'], f['name'], dest_dir="./Images")
             local_images.append(f['name'])
 
+    # Remove files that are in /Images but not on drive:
+    directory = os.fsencode("./Images")
+    for file in os.listdir(directory):
+        print(file.decode('UTF-8'))
+        status = False
+        for f in files:
+            if file.decode('UTF-8') == f['name']:
+                status = True
+        if not status:    
+            fpath = os.path.join("./Images", file.decode('UTF-8'))
+            if os.path.isfile(fpath):
+                print("File not found, deleting: " + fpath)
+                os.remove(fpath)
+
+                
+
 # Download files
 checkFilesAndDownload()
 
-# Variables for slideshow
-Num_images = len(local_images)
-imagecounter = 0
-mycamera = None
+
+
 
 #
 #   Function for toggling fullscreen
@@ -89,12 +108,15 @@ def setPhoto(filename):
 
 def slideshow():
     global imagecounter
+    global local_images
+
+    imagecounter = imagecounter + 1
+    imagecounter = imagecounter % len(local_images)    
+
     if not local_images:
         return  # nothing to show
     filename = os.path.join("./Images", local_images[imagecounter])
     setPhoto(filename)
-    imagecounter = imagecounter + 1
-    imagecounter = imagecounter % len(local_images)
     if (imagecounter == (len(local_images)-1)):
         checkFilesAndDownload()
     root.after(10000, slideshow)
